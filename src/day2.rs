@@ -1,11 +1,11 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
-pub fn run(day: char) {
+pub fn run(day: i32) {
     match day {
-        'a' => solve_p1(),
-        'b' => solve_p2(),
-        _ => println!("unknown day!"),
+        1 => solve_p1(),
+        2 => solve_p2(),
+        _ => println!("Unknown part!"),
     }
 }
 

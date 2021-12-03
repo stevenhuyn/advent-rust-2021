@@ -7,11 +7,11 @@ mod day3;
 fn main() {
     let args: Vec<String> = env::args().collect();
     let day = args[1].parse::<i32>().unwrap();
-    let part = args[2].chars().next().unwrap();
+    let part = args[2].parse::<i32>().unwrap();
     run(day, part);
 }
 
-fn run(day: i32, part: char) {
+fn run(day: i32, part: i32) {
     match day {
         1 => day1::run(part),
         2 => day2::run(part),

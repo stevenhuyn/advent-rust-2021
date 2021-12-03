@@ -2,20 +2,20 @@ use itertools::izip;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
-pub fn run(day: char) {
-    match day {
-        'a' => solve_p1(),
-        'b' => solve_p2(),
-        _ => println!("unknown day!"),
-    }
-}
-
 fn solve_p1() {
     println!("p1 answer")
 }
 
 fn solve_p2() {
     println!("p2 answer")
+}
+
+pub fn run(day: i32) {
+    match day {
+        1 => solve_p1(),
+        2 => solve_p2(),
+        _ => println!("Unknown part!"),
+    }
 }
 
 pub fn read_input(filename: &str) -> io::Result<Vec<i32>> {

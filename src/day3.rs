@@ -1,21 +1,13 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
-pub fn run(day: char) {
-    match day {
-        'a' => solve_p1(),
-        'b' => solve_p2(),
-        _ => println!("unknown day!"),
-    }
-}
-
 fn solve_p1() {
     let diag_lines = parse_input("input/day3.txt").unwrap();
     let diag_line_length = diag_lines[0].len();
     println!("Line length: {}", diag_line_length);
 
     let mut count = vec![0; diag_line_length];
-    for diag in diag_lines.iter() {
+    for diag in &diag_lines {
         for i in 0..diag_line_length {
             count[i] += diag[i];
         }
@@ -52,6 +44,14 @@ fn binary_vec_to_i32(vec: Vec<i32>) -> i32 {
 
 fn solve_p2() {
     println!("p2 answer")
+}
+
+pub fn run(day: i32) {
+    match day {
+        1 => solve_p1(),
+        2 => solve_p2(),
+        _ => println!("Unknown part!"),
+    }
 }
 
 pub fn parse_input(filename: &str) -> io::Result<Vec<Vec<i32>>> {
