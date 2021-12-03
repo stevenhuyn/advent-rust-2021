@@ -1,4 +1,4 @@
 advent-rust
 
 ## Running
-`cargo run [day: 1..25] [part: 1 | 2]`
+`cargo run [day: 1..25] [part: a | b]`
