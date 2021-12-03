@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
@@ -22,14 +23,14 @@ fn solve_p1() {
         }
     }
 
-    let gamma = binary_vec_to_i32(gamma_vec);
-    let epsilon = binary_vec_to_i32(epsilon_vec);
+    let gamma = binary_vec_to_i32(&gamma_vec);
+    let epsilon = binary_vec_to_i32(&epsilon_vec);
     println!("Gamma: {}", gamma);
     println!("Epsilon: {}", epsilon);
     println!("Multiplied: {}", gamma * epsilon)
 }
 
-fn binary_vec_to_i32(vec: Vec<i32>) -> i32 {
+fn binary_vec_to_i32(vec: &Vec<i32>) -> i32 {
     let mut i = 0;
     let mut value = 0;
     for n_ptr in vec.iter().rev() {
@@ -43,7 +44,34 @@ fn binary_vec_to_i32(vec: Vec<i32>) -> i32 {
 }
 
 fn solve_p2() {
-    println!("p2 answer")
+    let mut diag_lines = parse_input("input/day3.txt").unwrap();
+
+    let mut index = 0;
+    while diag_lines.len() > 1 {
+        let mode = most_common_bit(&diag_lines, index);
+        diag_lines.retain(|diag| diag[index as usize] == mode);
+        index += 1;
+    }
+
+    let last_diag = &diag_lines[0];
+    let co2 = binary_vec_to_i32(last_diag);
+    println!("co2: {}", co2);
+}
+
+fn common_bit(diag_lines: &Vec<Vec<i32>>, index: i32, bit: i32) -> i32 {
+    let mut counter: HashMap<i32, i32> = HashMap::new();
+
+    let slice: Vec<i32> = diag_lines.iter().map(|diag| diag[index as usize]).collect();
+
+    for v in slice {
+        *counter.entry(v).or_insert(0) += 1;
+    }
+
+    *counter
+        .iter()
+        .max_by(|kv1, kv2| kv1.1.cmp(kv2.1))
+        .map(|(k, _v)| k)
+        .unwrap()
 }
 
 pub fn run(day: i32) {
