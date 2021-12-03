@@ -44,18 +44,36 @@ fn binary_vec_to_i32(vec: &Vec<i32>) -> i32 {
 }
 
 fn solve_p2() {
+    // co2
     let mut diag_lines = parse_input("input/day3.txt").unwrap();
-
     let mut index = 0;
+
     while diag_lines.len() > 1 {
-        let mode = most_common_bit(&diag_lines, index);
+        let mode = common_bit(&diag_lines, index, 1);
         diag_lines.retain(|diag| diag[index as usize] == mode);
         index += 1;
     }
 
     let last_diag = &diag_lines[0];
     let co2 = binary_vec_to_i32(last_diag);
+    println!("co2_bin: {:?}", last_diag);
     println!("co2: {}", co2);
+
+    // oxygen
+    diag_lines = parse_input("input/day3.txt").unwrap();
+    index = 0;
+    while diag_lines.len() > 1 {
+        let mode = common_bit(&diag_lines, index, 0);
+        diag_lines.retain(|diag| diag[index as usize] == mode);
+        index += 1;
+    }
+
+    let last_diag = &diag_lines[0];
+    println!("oxygen_bin: {:?}", last_diag);
+    let oxygen = binary_vec_to_i32(last_diag);
+    println!("oxygen: {}", oxygen);
+
+    println!("combination: {}", co2 * oxygen)
 }
 
 fn common_bit(diag_lines: &Vec<Vec<i32>>, index: i32, bit: i32) -> i32 {
@@ -67,11 +85,21 @@ fn common_bit(diag_lines: &Vec<Vec<i32>>, index: i32, bit: i32) -> i32 {
         *counter.entry(v).or_insert(0) += 1;
     }
 
-    *counter
-        .iter()
-        .max_by(|kv1, kv2| kv1.1.cmp(kv2.1))
-        .map(|(k, _v)| k)
-        .unwrap()
+    if counter.get(&1) == counter.get(&0) {
+        bit
+    } else if counter.get(&1) > counter.get(&0) {
+        if bit == 1 {
+            1
+        } else {
+            0
+        }
+    } else {
+        if bit == 1 {
+            0
+        } else {
+            1
+        }
+    }
 }
 
 pub fn run(day: i32) {
