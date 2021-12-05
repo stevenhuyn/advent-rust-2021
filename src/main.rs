@@ -3,6 +3,7 @@ use std::env;
 mod day1;
 mod day2;
 mod day3;
+mod day4;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -16,6 +17,7 @@ fn run(day: i32, part: i32) {
         1 => day1::run(part),
         2 => day2::run(part),
         3 => day3::run(part),
+        4 => day4::run(part),
         _ => println!("bruh"),
     };
 }
