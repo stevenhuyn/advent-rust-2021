@@ -2,4 +2,4 @@
 
 ## How to run
 In root:
-`cargo run [day: 1..25] [part: a | b]`
+`cargo run [day: 1..25] [part: 1 | 2]`
