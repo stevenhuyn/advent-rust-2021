@@ -16,8 +16,10 @@ fn solve(enable_diag: bool) {
         *overlaps.entry((cur_x, cur_y)).or_insert(0) += 1;
         while (cur_x, cur_y) != (line_segment[2], line_segment[3]) {
             let delta_x = line_segment[2] - cur_x;
+
+            // Can use some cursed += if statements here / abs(delta)
             if delta_x > 0 {
-                cur_x += 1
+                cur_x += 1;
             } else if delta_x < 0 {
                 cur_x -= 1;
             }
@@ -63,6 +65,7 @@ pub fn read_input(filename: &str) -> io::Result<Vec<Vec<i32>>> {
     let lines = BufReader::new(file).lines();
 
     // Oh god what's the idiomatic way to read input in Rust?
+    // Also could probs use some structs and noice traits too
     let values: Vec<Vec<i32>> = lines
         .map(|line| {
             let line_res = line.unwrap();
