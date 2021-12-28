@@ -1,13 +1,53 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
+fn solve(enable_diag: bool) {
+    let mut line_segments = read_input("input/day5.txt").unwrap();
+
+    if !enable_diag {
+        line_segments.retain(|v| v[2] - v[0] == 0 || v[3] - v[1] == 0);
+    }
+
+    let mut overlaps: HashMap<(i32, i32), i32> = HashMap::new();
+    for line_segment in line_segments {
+        let mut cur_x = line_segment[0];
+        let mut cur_y = line_segment[1];
+        *overlaps.entry((cur_x, cur_y)).or_insert(0) += 1;
+        while (cur_x, cur_y) != (line_segment[2], line_segment[3]) {
+            let delta_x = line_segment[2] - cur_x;
+            if delta_x > 0 {
+                cur_x += 1
+            } else if delta_x < 0 {
+                cur_x -= 1;
+            }
+
+            let delta_y = line_segment[3] - cur_y;
+            if delta_y > 0 {
+                cur_y += 1
+            } else if delta_y < 0 {
+                cur_y -= 1;
+            }
+
+            // Inserts if doesn't exist to 0, always increments
+            *overlaps.entry((cur_x, cur_y)).or_insert(0) += 1;
+        }
+    }
+
+    let overlap_count: i32 = overlaps
+        .iter()
+        .filter_map(|(_k, &v)| if v <= 1 { None } else { Some(1) })
+        .sum();
+
+    println!("{:?}", overlap_count);
+}
+
 fn solve_p1() {
-    let coords = read_input("input/test5.txt").unwrap();
-    println!("{:?}", coords);
+    solve(false);
 }
 
 fn solve_p2() {
-    println!("p2 answer")
+    solve(true);
 }
 
 pub fn run(day: i32) {
