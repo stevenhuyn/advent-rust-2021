@@ -15,6 +15,31 @@ fn solve_p1() {
     }
 }
 
+fn solve_p2() {
+    let (draws, mut games) = read_input("input/day4.txt").unwrap();
+
+    let mut losers: Vec<usize> = (0..games.len()).collect();
+    let mut last_game_flag = false;
+    for draw in draws {
+        for (i, game) in games.iter_mut().enumerate() {
+            mark(draw, game);
+
+            if check_win(game) {
+                losers.retain(|&game_index| game_index != i);
+                if losers.len() == 1 {
+                    last_game_flag = true;
+                    continue;
+                }
+
+                if last_game_flag {
+                    println!("Solution: {}", solve(&game) * draw);
+                    return;
+                }
+            }
+        }
+    }
+}
+
 fn mark(draw: i32, game: &mut Vec<Vec<i32>>) {
     let board_width = game.len();
 
@@ -54,10 +79,6 @@ fn solve(game: &Vec<Vec<i32>>) -> i32 {
     }
 
     sum
-}
-
-fn solve_p2() {
-    println!("p2 answer")
 }
 
 pub fn run(day: i32) {
