@@ -62,6 +62,7 @@ pub fn read_input(filename: &str) -> io::Result<Vec<Vec<i32>>> {
     let file = File::open(filename)?;
     let lines = BufReader::new(file).lines();
 
+    // Oh god what's the idiomatic way to read input in Rust?
     let values: Vec<Vec<i32>> = lines
         .map(|line| {
             let line_res = line.unwrap();
