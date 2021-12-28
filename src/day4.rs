@@ -2,9 +2,58 @@ use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
 fn solve_p1() {
-    let (draws, games) = read_input("input/day4.txt").unwrap();
-    println!("{:?}", draws);
-    println!("{:?}", games);
+    let (draws, mut games) = read_input("input/day4.txt").unwrap();
+
+    for draw in draws {
+        for game in games.iter_mut() {
+            mark(draw, game);
+            if check_win(game) {
+                println!("Solution: {}", solve(game) * draw);
+                return;
+            }
+        }
+    }
+}
+
+fn mark(draw: i32, game: &mut Vec<Vec<i32>>) {
+    let board_width = game.len();
+
+    for i in 0..board_width {
+        for j in 0..board_width {
+            if game[i][j] == draw {
+                game[i][j] = -1;
+            }
+        }
+    }
+}
+
+fn check_win(game: &Vec<Vec<i32>>) -> bool {
+    let board_width = game.len();
+
+    for row in 0..board_width {
+        if (0..board_width).all(|col| game[row][col] == -1) {
+            return true;
+        }
+    }
+
+    for col in 0..board_width {
+        if (0..board_width).all(|row| game[row][col] == -1) {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn solve(game: &Vec<Vec<i32>>) -> i32 {
+    let mut sum = 0;
+    for row in game {
+        for val in row {
+            sum += if *val == -1 { 0 } else { *val }
+        }
+    }
+
+    sum
 }
 
 fn solve_p2() {
@@ -41,10 +90,7 @@ pub fn read_input(filename: &str) -> io::Result<(Vec<i32>, Vec<Vec<Vec<i32>>>)> 
         let row = line_str
             .trim()
             .split_whitespace()
-            .map(|n| {
-                println!("Test:{}", n);
-                n.parse::<i32>().unwrap()
-            })
+            .map(|n| n.parse::<i32>().unwrap())
             .collect();
 
         games.last_mut().unwrap().push(row);
