@@ -1,9 +1,11 @@
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
+use std::time::Instant;
 
 fn solve_p1() {
     let mut crabs = read_input("input/day7.txt").unwrap();
 
+    let now = Instant::now();
     crabs.sort();
     let median;
     if crabs.len() % 2 == 0 {
@@ -14,11 +16,14 @@ fn solve_p1() {
     let fuel: i32 = crabs.iter().map(|v| i32::abs(v - median)).sum();
 
     println!("{:?}", fuel);
+    println!("Finished in {:.5?}", now.elapsed());
 }
 
 // nlogn
 fn solve_p2() {
     let crabs = read_input("input/day7.txt").unwrap();
+
+    let now = Instant::now();
 
     let mut guess: i32 = crabs.iter().sum::<i32>() / crabs.len() as i32;
 
@@ -35,16 +40,6 @@ fn solve_p2() {
             .map(|v| triangle(i32::abs(v - (guess + 1))))
             .sum();
 
-        println!(
-            "{} {} {}:{} {}:{}",
-            lower_bound,
-            upper_bound,
-            guess,
-            guess_fuel,
-            guess + 1,
-            guess_plus_fuel
-        );
-
         if guess_plus_fuel > guess_fuel {
             upper_bound = guess;
             guess = (guess + lower_bound) / 2;
@@ -54,19 +49,16 @@ fn solve_p2() {
         }
     }
 
-    println!("{} {}", lower_bound, upper_bound);
     let target = upper_bound;
-    let sol: i32 = crabs.iter().map(|v| triangle(i32::abs(v - target))).sum();
-    println!("{}", sol);
+    let fuel: i32 = crabs.iter().map(|v| triangle(i32::abs(v - target))).sum();
+
+    println!("{}", fuel);
+    println!("Finished in {:.5?}", now.elapsed());
 }
 
 // Use cached crate or cache by hand?
 fn triangle(n: i32) -> i32 {
     n * (n + 1) / 2
-}
-
-fn inverse_pos_triangle(n: f32) -> f32 {
-    -1_f32 + (1_f32 + 8_f32 * n).sqrt() / 2_f32
 }
 
 pub fn run(day: i32) {
