@@ -1,13 +1,25 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
-fn solve(days: i32) {
-    let mut lanternfish = read_input("input/day6.txt").unwrap();
+fn solve(days: u128) {
+    let lanternfish = read_input("input/day6.txt").unwrap();
+
+    let mut school: HashMap<u128, u128> = HashMap::new();
+    for timer in 0..9 {
+        school.insert(timer, 0);
+    }
+
+    for v in lanternfish {
+        if let Some(timer) = school.get_mut(&v) {
+            *timer += 1;
+        }
+    }
 
     for _ in 0..days {
-        step(&mut lanternfish);
+        school = step(school);
     }
-    println!("{}", lanternfish.len());
+    println!("{}", school.values().sum::<u128>());
 }
 
 fn solve_p1() {
@@ -18,20 +30,20 @@ fn solve_p2() {
     solve(256);
 }
 
-const NEWBORN_TIMER: i32 = 8;
-const TIMER: i32 = 6;
-fn step(school: &mut Vec<i32>) {
-    let mut newborn_count = 0;
-    for fish_time in school.iter_mut() {
-        *fish_time = if *fish_time == 0 {
-            newborn_count += 1;
-            TIMER
-        } else {
-            *fish_time - 1
-        };
+fn step(school: HashMap<u128, u128>) -> HashMap<u128, u128> {
+    let mut new_school: HashMap<u128, u128> = HashMap::new();
+
+    for timer in 1..9 {
+        new_school.insert(timer - 1, *school.get(&(timer)).unwrap());
     }
 
-    school.extend(vec![NEWBORN_TIMER; newborn_count]);
+    let &parents = school.get(&0).unwrap();
+    new_school.insert(8, *school.get(&0).unwrap());
+    new_school.entry(6).and_modify(|v| {
+        *v += parents;
+    });
+
+    new_school
 }
 
 pub fn run(day: i32) {
@@ -42,7 +54,7 @@ pub fn run(day: i32) {
     }
 }
 
-pub fn read_input(filename: &str) -> io::Result<Vec<i32>> {
+pub fn read_input(filename: &str) -> io::Result<Vec<u128>> {
     let file = File::open(filename)?;
     let mut lines = BufReader::new(file).lines();
 
@@ -51,6 +63,6 @@ pub fn read_input(filename: &str) -> io::Result<Vec<i32>> {
         .unwrap()
         .unwrap()
         .split(",")
-        .map(|v| v.parse::<i32>().unwrap())
+        .map(|v| v.parse::<u128>().unwrap())
         .collect())
 }
