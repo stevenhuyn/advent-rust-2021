@@ -81,3 +81,23 @@ pub fn read_input(filename: &str) -> io::Result<Vec<i32>> {
         .map(|v| v.parse::<i32>().unwrap())
         .collect())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench_p1(b: &mut Bencher) {
+        b.iter(|| {
+            solve_p1();
+        });
+    }
+
+    #[bench]
+    fn bench_p2(b: &mut Bencher) {
+        b.iter(|| {
+            solve_p2();
+        });
+    }
+}

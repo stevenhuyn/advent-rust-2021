@@ -1,3 +1,7 @@
+#![feature(test)]
+
+extern crate test;
+
 use std::env;
 
 mod day1;
