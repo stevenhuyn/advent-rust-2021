@@ -16,20 +16,48 @@ fn solve_p1() {
     println!("{:?}", fuel);
 }
 
+// nlogn
 fn solve_p2() {
     let crabs = read_input("input/day7.txt").unwrap();
 
-    let &min = crabs.iter().min().unwrap();
-    let &max = crabs.iter().max().unwrap();
+    let mut guess: i32 = crabs.iter().sum::<i32>() / crabs.len() as i32;
 
-    let min_inv_triangle = inverse_pos_triangle(min as f32);
-    let max_inv_triangle = inverse_pos_triangle(max as f32);
+    let mut lower_bound = *crabs.iter().min().unwrap();
+    let mut upper_bound = *crabs.iter().max().unwrap();
 
-    let target = (max_inv_triangle - min_inv_triangle).round() as i32;
+    let mut guess_fuel: i32;
+    let mut guess_plus_fuel: i32;
 
-    let fuel: i32 = crabs.iter().map(|v| triangle(i32::abs(v - target))).sum();
+    while upper_bound != lower_bound {
+        guess_fuel = crabs.iter().map(|v| triangle(i32::abs(v - guess))).sum();
+        guess_plus_fuel = crabs
+            .iter()
+            .map(|v| triangle(i32::abs(v - (guess + 1))))
+            .sum();
 
-    println!("{}", fuel);
+        println!(
+            "{} {} {}:{} {}:{}",
+            lower_bound,
+            upper_bound,
+            guess,
+            guess_fuel,
+            guess + 1,
+            guess_plus_fuel
+        );
+
+        if guess_plus_fuel > guess_fuel {
+            upper_bound = guess;
+            guess = (guess + lower_bound) / 2;
+        } else {
+            lower_bound = guess + 1;
+            guess = (guess + upper_bound) / 2;
+        }
+    }
+
+    println!("{} {}", lower_bound, upper_bound);
+    let target = upper_bound;
+    let sol: i32 = crabs.iter().map(|v| triangle(i32::abs(v - target))).sum();
+    println!("{}", sol);
 }
 
 // Use cached crate or cache by hand?
