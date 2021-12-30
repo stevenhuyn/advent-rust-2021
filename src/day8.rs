@@ -11,10 +11,7 @@ fn solve_p1() {
 
         for digit in output {
             count += match digit.len() {
-                2 => 1,
-                3 => 1,
-                4 => 1,
-                7 => 1,
+                2 | 3 | 4 | 7 => 1,
                 _ => 0,
             }
         }
