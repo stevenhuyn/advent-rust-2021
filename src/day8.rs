@@ -1,6 +1,7 @@
 use itertools::Itertools;
+use std::error::Error;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
 
 fn solve_p1() {
     let lines = read_input("input/day8.txt").unwrap();
@@ -22,7 +23,7 @@ fn solve_p1() {
 }
 
 fn solve_p2() {
-    let lines = read_input("input/day8.txt").unwrap();
+    let _lines = read_input("input/day8.txt").unwrap();
 
     for perm in String::from("abcdefg").chars().permutations(7) {
         println!("{:?}", perm);
@@ -38,7 +39,7 @@ pub fn run(day: i32) {
     }
 }
 
-pub fn read_input(filename: &str) -> io::Result<Vec<Vec<Vec<String>>>> {
+pub fn read_input(filename: &str) -> Result<Vec<Vec<Vec<String>>>, Box<dyn Error>> {
     let file = File::open(filename)?;
     let lines = BufReader::new(file).lines();
 

@@ -17,7 +17,7 @@ pub fn run(day: i32) {
     }
 }
 
-pub fn read_input(filename: &str) -> io::Result<Vec<i32>> {
+pub fn read_input(filename: &str) -> Result<Vec<i32>, Box<dyn Error>> {
     let file = File::open(filename)?;
     let lines = BufReader::new(file).lines();
 
