@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
@@ -21,6 +22,11 @@ fn solve_p1() {
 }
 
 fn solve_p2() {
+    let lines = read_input("input/day8.txt").unwrap();
+
+    for perm in String::from("abcdefg").chars().permutations(7) {
+        println!("{:?}", perm);
+    }
     println!("p2 answer")
 }
 
