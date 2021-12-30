@@ -1,7 +1,5 @@
 #![feature(test)]
-
 extern crate test;
-
 use std::env;
 
 mod day1;
@@ -11,6 +9,7 @@ mod day4;
 mod day5;
 mod day6;
 mod day7;
+mod day8;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -28,6 +27,7 @@ fn run(day: i32, part: i32) {
         5 => day5::run(part),
         6 => day6::run(part),
         7 => day7::run(part),
+        8 => day8::run(part),
         _ => println!("bruh"),
     };
 }
