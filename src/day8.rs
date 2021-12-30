@@ -10,9 +10,9 @@ fn solve_p1() {
         let output = &line[1];
 
         for digit in output {
-            count += match digit.len() {
-                2 | 3 | 4 | 7 => 1,
-                _ => 0,
+            match digit.len() {
+                2 | 3 | 4 | 7 => count += 1,
+                _ => (),
             }
         }
     }
