@@ -1,5 +1,4 @@
 use itertools::Itertools;
-use std::collections::HashSet;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -60,10 +59,8 @@ const DIG_SOL_ARR: [&str; 10] = [
 
 /// Verifies a singular permutation for a given digit
 fn verify_digit(perm: &Vec<char>, digit: &String) -> bool {
-    let sols: HashSet<&str> = HashSet::from(DIG_SOL_ARR);
     let converted_entry: String = remap_digit(perm, digit);
-    sols.contains(converted_entry.as_str())
-    // DIG_SOL_ARR.contains(&converted_entry.as_str())
+    DIG_SOL_ARR.contains(&converted_entry.as_str())
 }
 
 fn convert_digit(perm: &Vec<char>, digit: &String) -> i32 {
