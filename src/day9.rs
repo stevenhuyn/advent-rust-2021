@@ -5,10 +5,24 @@ use std::io::{BufRead, BufReader};
 fn solve_p1() {
     let map = read_input("input/day9.txt").unwrap();
 
+    let lowpoints = find_basins(&map);
+    let mut risk_level = 0;
+
+    for (x, y) in lowpoints {
+        risk_level += map[x][y] + 1;
+    }
+
+    println!("risk level: {}", risk_level);
+}
+
+fn solve_p2() {
+    println!("p2 answer")
+}
+
+fn find_basins(map: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
+    let mut lowpoints = Vec::new();
     let xlen = map.len() as i32;
     let ylen = map[0].len() as i32;
-
-    let mut risk_level = 0;
     for x in 0..xlen {
         for y in 0..ylen {
             let mut is_lowpoint = true;
@@ -22,15 +36,12 @@ fn solve_p1() {
             }
 
             if is_lowpoint {
-                risk_level += map[x as usize][y as usize] + 1;
+                lowpoints.push((x as usize, y as usize));
             }
         }
     }
-    println!("risk level: {}", risk_level);
-}
 
-fn solve_p2() {
-    println!("p2 answer")
+    lowpoints
 }
 
 pub fn run(day: i32) {
