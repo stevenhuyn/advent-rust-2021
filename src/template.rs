@@ -1,5 +1,6 @@
+use std::error::Error;
 use std::fs::File;
-use std::io::{self, BufRead, BufReader};
+use std::io::{BufRead, BufReader};
 
 fn solve_p1() {
     println!("p1 answer")
