@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -16,7 +17,48 @@ fn solve_p1() {
 }
 
 fn solve_p2() {
-    println!("p2 answer")
+    let map = read_input("input/day9.txt").unwrap();
+
+    let lowpoints = find_basins(&map);
+    let xlen = map.len() as i32;
+    let ylen = map[0].len() as i32;
+
+    let mut basin_sizes: Vec<usize> = Vec::new();
+
+    // Using a BFS to spread out the basins!!!
+    for (x_seed, y_seed) in lowpoints {
+        let mut queue = Vec::from([(x_seed, y_seed)]);
+        let mut seen: HashSet<(usize, usize)> = HashSet::from([(x_seed, y_seed)]);
+
+        while !queue.is_empty() {
+            let u = queue.pop().unwrap();
+
+            // Get neighbours
+            let (x, y) = (u.0 as i32, u.1 as i32);
+            for (dx, dy) in [(0, 1), (1, 0), (0, -1), (-1, 0)] as [(i32, i32); 4] {
+                let neighbour = ((x + dx) as usize, (y + dy) as usize);
+
+                // Check if out of bounds
+                if x + dx >= 0 && x + dx < xlen && y + dy >= 0 && y + dy < ylen {
+                    // Check if upwards flow and not a 9
+                    if map[neighbour.0][neighbour.1] > map[u.0][u.1]
+                        && map[neighbour.0][neighbour.1] != 9
+                        && !seen.contains(&(neighbour))
+                    {
+                        seen.insert(neighbour);
+                        queue.insert(0, neighbour);
+                    }
+                }
+            }
+        }
+        basin_sizes.push(seen.len());
+    }
+
+    basin_sizes.sort();
+    basin_sizes.reverse();
+    let result: usize = basin_sizes.iter().take(3).into_iter().product();
+
+    println!("{}", result);
 }
 
 fn find_basins(map: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
