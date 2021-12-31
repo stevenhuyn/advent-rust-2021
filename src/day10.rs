@@ -7,6 +7,23 @@ fn solve_p1() {
 
     let mut stack: Vec<char> = Vec::new();
     let mut corrupted_chars: Vec<char> = Vec::new();
+    verify_nav(&nav_sys, &mut stack, &mut corrupted_chars);
+
+    let error_score: i32 = corrupted_chars
+        .into_iter()
+        .map(|c| match c {
+            ')' => 3,
+            ']' => 57,
+            '}' => 1197,
+            '>' => 25137,
+            _ => panic!("Unrecognised character"),
+        })
+        .sum();
+
+    println!("Error score {}", error_score);
+}
+
+fn verify_nav(nav_sys: &Vec<String>, stack: &mut Vec<char>, corrupted_chars: &mut Vec<char>) {
     for line in nav_sys {
         for char in line.chars() {
             let matched_opt: Option<char> = match char {
@@ -35,19 +52,6 @@ fn solve_p1() {
             }
         }
     }
-
-    let error_score: i32 = corrupted_chars
-        .into_iter()
-        .map(|c| match c {
-            ')' => 3,
-            ']' => 57,
-            '}' => 1197,
-            '>' => 25137,
-            _ => panic!("Unrecognised character"),
-        })
-        .sum();
-
-    println!("Error score {}", error_score);
 }
 
 fn solve_p2() {
