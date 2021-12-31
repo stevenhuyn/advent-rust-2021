@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use std::collections::HashSet;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -22,13 +23,85 @@ fn solve_p1() {
     println!("{}", count);
 }
 
+/// Brute force cause 7! = 5040 combos
 fn solve_p2() {
-    let _lines = read_input("input/day8.txt").unwrap();
+    let lines = read_input("input/day8.txt").unwrap();
 
-    for perm in String::from("abcdefg").chars().permutations(7) {
-        println!("{:?}", perm);
+    let mut sum = 0;
+    for (i, perm) in String::from("abcdefg").chars().permutations(7).enumerate() {
+        println!("{}", i);
+        let mut valid_perm = true;
+        for line in &lines {
+            let uniques = &line[0];
+            let output = &line[1];
+
+            for digit in uniques.iter().chain(output.iter()) {
+                if !verify_digit(&perm, digit) {
+                    valid_perm = false;
+                    break;
+                }
+            }
+
+            if valid_perm {
+                println!("{:?}", perm);
+                sum += convert_output(&perm, output);
+            }
+        }
     }
-    println!("p2 answer")
+}
+
+const DIG_SOL_ARR: [&str; 10] = [
+    "abcefg", "cf", "acdeg", "acdfg", "bcdf", "abdfg", "abdefg", "acf", "abcdefg", "abcdfg",
+];
+
+/// Verifies a singular permutation for a given digit
+fn verify_digit(perm: &Vec<char>, digit: &String) -> bool {
+    match digit.len() {
+        2 | 3 | 4 | 7 => return true,
+        _ => (),
+    }
+
+    let sols: HashSet<&str> = HashSet::from(DIG_SOL_ARR);
+
+    let converted_entry: String = remap_digit(perm, digit);
+
+    sols.contains(converted_entry.as_str())
+}
+
+fn convert_digit(perm: &Vec<char>, digit: &String) -> i32 {
+    let converted_entry: String = remap_digit(perm, digit);
+
+    return DIG_SOL_ARR
+        .iter()
+        .position(|&x| x == converted_entry)
+        .unwrap() as i32;
+}
+
+fn convert_output(perm: &Vec<char>, output: &Vec<String>) -> i32 {
+    let mut num = 0;
+    for digit in output {
+        num *= 10;
+        num += convert_digit(perm, &digit);
+    }
+
+    num
+}
+
+fn remap_digit(perm: &Vec<char>, entry: &String) -> String {
+    entry
+        .chars()
+        .map(|c| match perm.iter().position(|&x| x == c).unwrap() {
+            0 => 'a',
+            1 => 'b',
+            2 => 'c',
+            3 => 'd',
+            4 => 'e',
+            5 => 'f',
+            6 => 'g',
+            _ => panic!("Bad index"),
+        })
+        .sorted()
+        .collect();
 }
 
 pub fn run(day: i32) {
