@@ -4,6 +4,7 @@ use std::env;
 
 mod day1;
 mod day10;
+mod day11;
 mod day2;
 mod day3;
 mod day4;
@@ -32,6 +33,7 @@ fn run(day: i32, part: i32) {
         8 => day8::run(part),
         9 => day9::run(part),
         10 => day10::run(part),
+        11 => day11::run(part),
         _ => println!("bruh"),
     };
 }
