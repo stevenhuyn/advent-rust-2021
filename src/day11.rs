@@ -14,7 +14,7 @@ fn solve_p1() {
 
     let mut flash_count = 0;
 
-    for i in 0..100 {
+    for _ in 0..100 {
         let mut queue: Vec<(usize, usize)> = Vec::new();
         let mut seen: HashSet<(usize, usize)> = HashSet::new();
 
@@ -36,9 +36,13 @@ fn solve_p1() {
 
             // get neighbours, flash and push new octopi to 9s in queue
             for (dx, dy) in [-1i32, 0, 1].into_iter().cartesian_product([-1i32, 0, 1]) {
+                if x as i32 + dx < 0 || y as i32 + dy < 0 {
+                    continue;
+                }
+
                 let nx = (x as i32 + dx) as usize;
                 let ny = (y as i32 + dy) as usize;
-                if (nx, ny) != flash_octo && 0 <= nx && nx < xlen && 0 <= ny && ny < ylen {
+                if (nx, ny) != flash_octo && nx < xlen && ny < ylen {
                     grid[nx][ny] += 1;
                     if !seen.contains(&(nx, ny)) && grid[nx][ny] > 9 {
                         queue.push((nx, ny));
