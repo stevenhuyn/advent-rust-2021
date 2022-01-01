@@ -8,16 +8,19 @@ fn solve_p1() {
     let adj_map = create_adj_map(edges);
 
     let mut stack: Vec<String> = Vec::from(["start".to_owned()]);
-    let mut pred: HashMap<String, String> =
-        HashMap::from([(String::from("start"), String::from("null"))]);
+    let mut seen_small: HashMap<String, Vec<String>> =
+        HashMap::from([("start".to_owned(), Vec::new())]);
 
     // Inefficient memorywise...?
     let mut path_count = 0;
     // while !stack.is_empty() {
-    for _ in 0..15 {
+    for _ in 0.. {
         let u = stack.pop().unwrap();
 
+        let u_trav = &seen_small.get(&u).unwrap().clone();
+
         for v in adj_map.get(&u).unwrap() {
+            println!("{:?}", seen_small);
             if v == "end" {
                 path_count += 1;
                 continue;
@@ -27,32 +30,23 @@ fn solve_p1() {
                 continue;
             }
 
-            if v.chars().next().unwrap().is_lowercase() && v.len() == 1 {
-                if pred_contains(v, &u, &pred) {
-                    continue;
+            if !u_trav.contains(v) {
+                stack.push(v.clone());
+                if let None = seen_small.get(v) {
+                    seen_small.insert(v.clone(), Vec::new());
+                }
+
+                if !v.chars().next().unwrap().is_uppercase() && v != "end" {
+                    let u_trav = seen_small.get_mut(&u).unwrap().clone();
+                    let v_trav = seen_small.get_mut(v).unwrap();
+                    v_trav.extend([v.clone()]);
+                    v_trav.extend(u_trav);
                 }
             }
-
-            stack.push(v.clone());
-            pred.insert(v.clone(), u.clone());
         }
     }
 
     println!("{:?}", path_count);
-}
-
-fn pred_contains(target: &String, start: &String, pred: &HashMap<String, String>) -> bool {
-    let mut curr = start;
-    while curr != &String::from("null") {
-        println!("{}", curr);
-        if curr == target {
-            return true;
-        }
-
-        curr = pred.get(curr).unwrap();
-    }
-
-    return false;
 }
 
 fn create_adj_map(edges: Vec<(String, String)>) -> HashMap<String, Vec<String>> {
@@ -71,7 +65,7 @@ fn create_adj_map(edges: Vec<(String, String)>) -> HashMap<String, Vec<String>> 
     }
 
     adj_map
-}`
+}
 
 fn solve_p2() {}
 
