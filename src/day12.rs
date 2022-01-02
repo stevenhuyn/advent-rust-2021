@@ -8,19 +8,27 @@ fn solve_p1() {
     let adj_map = create_adj_map(edges);
 
     let mut stack: Vec<String> = Vec::from(["start".to_owned()]);
-    let mut seen_small: HashMap<String, Vec<String>> =
-        HashMap::from([("start".to_owned(), Vec::new())]);
+    let mut seen_small: HashMap<String, Vec<String>> = HashMap::new();
 
     // Inefficient memorywise...?
     let mut path_count = 0;
-    // while !stack.is_empty() {
-    for _ in 0.. {
+    while !stack.is_empty() {
+        // for _ in 0.. {
         let u = stack.pop().unwrap();
+        println!();
+        println!("u: {}", u);
+        println!("stack: {:?}", stack);
+        println!("stack: {:?}", seen_small);
 
-        let u_trav = &seen_small.get(&u).unwrap().clone();
+        if let None = &seen_small.get(&u) {
+            seen_small.insert(u.clone(), Vec::new());
+        }
 
+        let u_seen = seen_small.get_mut(&u).unwrap();
+
+        let mut neigh_seen = false;
         for v in adj_map.get(&u).unwrap() {
-            println!("{:?}", seen_small);
+            print!("{}, ", v);
             if v == "end" {
                 path_count += 1;
                 continue;
@@ -30,20 +38,22 @@ fn solve_p1() {
                 continue;
             }
 
-            if !u_trav.contains(v) {
-                stack.push(v.clone());
-                if let None = seen_small.get(v) {
-                    seen_small.insert(v.clone(), Vec::new());
-                }
+            // Only push it it doesn't contain lowercase v
 
-                if !v.chars().next().unwrap().is_uppercase() && v != "end" {
-                    let u_trav = seen_small.get_mut(&u).unwrap().clone();
-                    let v_trav = seen_small.get_mut(v).unwrap();
-                    v_trav.extend([v.clone()]);
-                    v_trav.extend(u_trav);
+            if !u_seen.contains(v) {
+                stack.push(v.clone());
+                neigh_seen = true;
+
+                if !v.chars().next().unwrap().is_uppercase() {
+                    u_seen.push(v.clone());
                 }
             }
+
+            if !neigh_seen {
+                u_seen.clear();
+            }
         }
+        println!();
     }
 
     println!("{:?}", path_count);
