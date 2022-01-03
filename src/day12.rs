@@ -62,12 +62,14 @@ fn solve_p2() {
     let edges = read_input("input/day12.txt").unwrap();
     let adj_map = create_adj_map(edges);
 
-    let mut stack: Vec<(String, Vec<String>)> = Vec::from([("start".to_owned(), Vec::new())]);
+    let mut stack: Vec<(String, Vec<String>, bool)> =
+        Vec::from([("start".to_owned(), Vec::new(), false)]);
 
     // Inefficient memorywise...?
     let mut path_count = 0;
     while !stack.is_empty() {
-        let (u, seen) = stack.pop().unwrap();
+        let (u, seen, double_cave_visit) = stack.pop().unwrap();
+
         for v in adj_map.get(&u).unwrap() {
             if v == "end" {
                 path_count += 1;
@@ -80,25 +82,19 @@ fn solve_p2() {
 
             // Pushing new cave
             let mut new_seen = seen.clone();
+            let mut new_double_cave_visit = double_cave_visit;
             if !v.chars().next().unwrap().is_uppercase() {
-                // Check if we already traversed a small cave twice
-                let double_small_cave = seen
-                    .iter()
-                    .map(|small_cave_keep| {
-                        seen.iter()
-                            .filter(|small_cave| small_cave_keep == *small_cave)
-                            .count()
-                    })
-                    .any(|counts| counts == 2);
-
                 let cave_seen_count = seen.iter().filter(|s| *s == v).count();
-                if cave_seen_count == 0 || (cave_seen_count == 1 && !double_small_cave) {
+                if cave_seen_count == 0 {
+                    new_seen.push(v.clone());
+                } else if cave_seen_count == 1 && !double_cave_visit {
+                    new_double_cave_visit = true;
                     new_seen.push(v.clone());
                 } else {
                     continue;
                 }
             }
-            stack.push((v.clone(), new_seen));
+            stack.push((v.clone(), new_seen, new_double_cave_visit));
         }
     }
 
