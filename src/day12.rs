@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::time::Instant;
 
 fn solve_p1() {
     let edges = read_input("input/day12.txt").unwrap();
@@ -102,11 +103,13 @@ fn solve_p2() {
 }
 
 pub fn run(day: i32) {
+    let now = Instant::now();
     match day {
         1 => solve_p1(),
         2 => solve_p2(),
         _ => println!("Unknown part!"),
     }
+    println!("Ran in {}", now.elapsed().as_secs_f64());
 }
 
 pub fn read_input(filename: &str) -> Result<Vec<(String, String)>, Box<dyn Error>> {
