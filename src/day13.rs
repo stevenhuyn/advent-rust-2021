@@ -1,3 +1,4 @@
+use std::cmp::max;
 use std::collections::HashSet;
 use std::error::Error;
 use std::fs::File;
@@ -17,23 +18,23 @@ fn solve_p1() {
     apply_folds(&mut coords, &folds);
 
     println!("{}", coords.len());
-    println!("p1 answer")
 }
 
 fn apply_folds(coords: &mut HashSet<(i32, i32)>, folds: &Vec<Fold>) {
-    let first_fold = &folds[0];
-    for (x, y) in coords.clone() {
-        match first_fold {
-            Fold::X(n) => {
-                if x > *n {
-                    coords.insert((-1 * x + 2 * n, y));
-                    coords.remove(&(x, y));
+    for fold in folds {
+        for (x, y) in coords.clone() {
+            match fold {
+                Fold::X(n) => {
+                    if x > *n {
+                        coords.insert((-1 * x + 2 * n, y));
+                        coords.remove(&(x, y));
+                    }
                 }
-            }
-            Fold::Y(n) => {
-                if y > *n {
-                    coords.insert((-1 * y + 2 * n, y));
-                    coords.remove(&(x, y));
+                Fold::Y(n) => {
+                    if y > *n {
+                        coords.insert((x, -1 * y + 2 * n));
+                        coords.remove(&(x, y));
+                    }
                 }
             }
         }
@@ -41,7 +42,33 @@ fn apply_folds(coords: &mut HashSet<(i32, i32)>, folds: &Vec<Fold>) {
 }
 
 fn solve_p2() {
-    println!("p2 answer")
+    let (mut coords, folds) = read_input("input/day13.txt").unwrap();
+    println!("{}", coords.len());
+
+    apply_folds(&mut coords, &folds);
+    println!("{:?}", coords);
+
+    // now to print final
+    // get max x and y
+    let mut max_x = -1;
+    let mut max_y = -1;
+    for (x, y) in &coords {
+        max_x = max(*x, max_x);
+        max_y = max(*y, max_y);
+    }
+
+    for y in 0..(max_y + 1) {
+        for x in 0..(max_x + 1) {
+            if coords.contains(&(x, y)) {
+                print!("X");
+            } else {
+                print!(".");
+            }
+        }
+        println!("");
+    }
+
+    println!("{}", coords.len());
 }
 
 pub fn run(day: i32) {
