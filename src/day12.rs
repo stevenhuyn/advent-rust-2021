@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::time::Instant;
 
 fn solve_p1() {
     let edges = read_input("input/day12.txt").unwrap();
@@ -66,6 +67,7 @@ fn solve_p2() {
 
     // Inefficient memorywise...?
     let mut path_count = 0;
+
     while !stack.is_empty() {
         let (u, seen) = stack.pop().unwrap();
         for v in adj_map.get(&u).unwrap() {
@@ -79,9 +81,11 @@ fn solve_p2() {
             }
 
             // Pushing new cave
+
             let mut new_seen = seen.clone();
             if !v.chars().next().unwrap().is_uppercase() {
                 // Check if we already traversed a small cave twice
+
                 let double_small_cave = seen
                     .iter()
                     .map(|small_cave_keep| {
@@ -98,19 +102,21 @@ fn solve_p2() {
                     continue;
                 }
             }
+
             stack.push((v.clone(), new_seen));
         }
     }
-
     println!("{:?}", path_count);
 }
 
 pub fn run(day: i32) {
+    let now = Instant::now();
     match day {
         1 => solve_p1(),
         2 => solve_p2(),
         _ => println!("Unknown part!"),
     }
+    println!("Ran in {}", now.elapsed().as_secs_f64());
 }
 
 pub fn read_input(filename: &str) -> Result<Vec<(String, String)>, Box<dyn Error>> {
