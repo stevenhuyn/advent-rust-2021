@@ -4,31 +4,16 @@ use std::fs::File;
 use std::io::{BufRead, BufReader};
 
 fn solve_p1() {
-    let edges = read_input("input/test12.txt").unwrap();
+    let edges = read_input("input/day12.txt").unwrap();
     let adj_map = create_adj_map(edges);
 
-    let mut stack: Vec<String> = Vec::from(["start".to_owned()]);
-    let mut seen_small: HashMap<String, Vec<String>> = HashMap::new();
+    let mut stack: Vec<(String, Vec<String>)> = Vec::from([("start".to_owned(), Vec::new())]);
 
     // Inefficient memorywise...?
     let mut path_count = 0;
     while !stack.is_empty() {
-        // for _ in 0.. {
-        let u = stack.pop().unwrap();
-        println!();
-        println!("u: {}", u);
-        println!("stack: {:?}", stack);
-        println!("stack: {:?}", seen_small);
-
-        if let None = &seen_small.get(&u) {
-            seen_small.insert(u.clone(), Vec::new());
-        }
-
-        let u_seen = seen_small.get_mut(&u).unwrap();
-
-        let mut neigh_seen = false;
+        let (u, seen) = stack.pop().unwrap();
         for v in adj_map.get(&u).unwrap() {
-            print!("{}, ", v);
             if v == "end" {
                 path_count += 1;
                 continue;
@@ -40,20 +25,16 @@ fn solve_p1() {
 
             // Only push it it doesn't contain lowercase v
 
-            if !u_seen.contains(v) {
-                stack.push(v.clone());
-                neigh_seen = true;
-
+            if !seen.contains(v) {
+                let mut new_seen = seen.clone();
                 if !v.chars().next().unwrap().is_uppercase() {
-                    u_seen.push(v.clone());
+                    // Small cave so add to seen
+                    new_seen.push(v.clone());
                 }
-            }
 
-            if !neigh_seen {
-                u_seen.clear();
+                stack.push((v.clone(), new_seen));
             }
         }
-        println!();
     }
 
     println!("{:?}", path_count);
@@ -77,7 +58,52 @@ fn create_adj_map(edges: Vec<(String, String)>) -> HashMap<String, Vec<String>> 
     adj_map
 }
 
-fn solve_p2() {}
+fn solve_p2() {
+    let edges = read_input("input/day12.txt").unwrap();
+    let adj_map = create_adj_map(edges);
+
+    let mut stack: Vec<(String, Vec<String>)> = Vec::from([("start".to_owned(), Vec::new())]);
+
+    // Inefficient memorywise...?
+    let mut path_count = 0;
+    while !stack.is_empty() {
+        let (u, seen) = stack.pop().unwrap();
+        for v in adj_map.get(&u).unwrap() {
+            if v == "end" {
+                path_count += 1;
+                continue;
+            }
+
+            if v == "start" {
+                continue;
+            }
+
+            // Pushing new cave
+            let mut new_seen = seen.clone();
+            if !v.chars().next().unwrap().is_uppercase() {
+                // Check if we already traversed a small cave twice
+                let double_small_cave = seen
+                    .iter()
+                    .map(|small_cave_keep| {
+                        seen.iter()
+                            .filter(|small_cave| small_cave_keep == *small_cave)
+                            .count()
+                    })
+                    .any(|counts| counts == 2);
+
+                let cave_seen_count = seen.iter().filter(|s| *s == v).count();
+                if cave_seen_count == 0 || (cave_seen_count == 1 && !double_small_cave) {
+                    new_seen.push(v.clone());
+                } else {
+                    continue;
+                }
+            }
+            stack.push((v.clone(), new_seen));
+        }
+    }
+
+    println!("{:?}", path_count);
+}
 
 pub fn run(day: i32) {
     match day {
