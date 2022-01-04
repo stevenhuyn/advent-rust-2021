@@ -4,6 +4,9 @@ use std::io::{BufRead, BufReader};
 use std::time::Instant;
 
 fn solve_p1() {
+    let (seed, instructions) = read_input("input/test14.txt").unwrap();
+
+    println!("{:?}, {:?}", seed, instructions);
     println!("p1 answer")
 }
 
@@ -21,12 +24,23 @@ pub fn run(day: i32) {
     println!("Ran in {}", now.elapsed().as_secs_f64());
 }
 
-pub fn read_input(filename: &str) -> Result<Vec<i32>, Box<dyn Error>> {
+pub fn read_input(filename: &str) -> Result<(String, Vec<(String, String)>), Box<dyn Error>> {
     let file = File::open(filename)?;
     let bufreader = BufReader::new(file);
-    let lines = bufreader.lines();
+    let mut lines = bufreader.lines();
 
-    Ok(lines.map(|a| a.unwrap().parse::<i32>().unwrap()).collect())
+    let seed = lines.next().unwrap().unwrap();
+
+    let mut instructions: Vec<(String, String)> = Vec::new();
+    for line_res in lines.skip(1) {
+        let line = line_res.unwrap();
+        let mut split = line.split(" -> ");
+        let lhs = split.next().unwrap().to_owned();
+        let rhs = split.next().unwrap().to_owned();
+        instructions.push((lhs, rhs));
+    }
+
+    Ok((seed, instructions))
 }
 
 #[cfg(test)]
