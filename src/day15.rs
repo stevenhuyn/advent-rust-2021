@@ -15,32 +15,7 @@ fn solve_p1() {
     gen_graph(&grid, &mut adj_map, &mut tentative);
 
     // Run dijkstras
-    let mut heap: BinaryHeap<(i32, (usize, usize))> = BinaryHeap::new();
-    let mut seen: HashSet<(usize, usize)> = HashSet::new();
-    heap.push((0, (0, 0)));
-
-    let mut stepped_once = false;
-    while !heap.is_empty() {
-        let (_, u) = heap.pop().unwrap();
-        let u_dist = *tentative.get(&u).unwrap();
-
-        if stepped_once {
-            seen.insert(u);
-        }
-        stepped_once = true;
-
-        if u == (grid.len() - 1, grid[0].len() - 1) {
-            break;
-        }
-
-        for (v, uv_dist) in adj_map.get(&u).unwrap() {
-            let uv_tent = tentative.get_mut(v).unwrap();
-            if u_dist + uv_dist < *uv_tent && !seen.contains(v) {
-                *uv_tent = u_dist + uv_dist;
-                heap.push((-(*uv_tent), *v));
-            }
-        }
-    }
+    dijkstra(&grid, &adj_map, &mut tentative);
 
     // Get bottom right tentative distance (the min distance)
     println!(
@@ -78,8 +53,93 @@ fn gen_graph(
     tentative.insert((0, 0), 0);
 }
 
+fn gen_graph_5x(
+    grid: &mut Vec<Vec<i32>>,
+    adj_map: &mut HashMap<(usize, usize), Vec<((usize, usize), i32)>>,
+    tentative: &mut HashMap<(usize, usize), i32>,
+) {
+    let mut new_grid = grid.clone();
+
+    let xlen = new_grid.len();
+
+    // Extend horizontally
+    for i in 1..5 {
+        for row in new_grid.iter_mut() {
+            row.extend(row.clone().iter().take(xlen).map(|&v| {
+                if v + i > 9 {
+                    ((v + i) % 10) + 1
+                } else {
+                    v + i
+                }
+            }));
+        }
+    }
+
+    // Extend vertically
+    let long_grid = new_grid.clone();
+    for j in 1..5 {
+        for row in long_grid.iter() {
+            new_grid.push(
+                row.iter()
+                    .map(|&v| if v + j > 9 { ((v + j) % 10) + 1 } else { v + j })
+                    .collect(),
+            );
+        }
+    }
+
+    gen_graph(&new_grid, adj_map, tentative);
+    *grid = new_grid;
+}
+
+fn dijkstra(
+    grid: &Vec<Vec<i32>>,
+    adj_map: &HashMap<(usize, usize), Vec<((usize, usize), i32)>>,
+    tentative: &mut HashMap<(usize, usize), i32>,
+) {
+    let mut heap: BinaryHeap<(i32, (usize, usize))> = BinaryHeap::new();
+    let mut seen: HashSet<(usize, usize)> = HashSet::new();
+    heap.push((0, (0, 0)));
+
+    let mut stepped_once = false;
+    while !heap.is_empty() {
+        let (_, u) = heap.pop().unwrap();
+        let u_dist = *tentative.get(&u).unwrap();
+
+        if stepped_once {
+            seen.insert(u);
+        }
+        stepped_once = true;
+
+        if u == (grid.len() - 1, grid[0].len() - 1) {
+            break;
+        }
+
+        for (v, uv_dist) in adj_map.get(&u).unwrap() {
+            let uv_tent = tentative.get_mut(v).unwrap();
+            if u_dist + uv_dist < *uv_tent && !seen.contains(v) {
+                *uv_tent = u_dist + uv_dist;
+                heap.push((-(*uv_tent), *v));
+            }
+        }
+    }
+}
+
 fn solve_p2() {
-    println!("p2 answer")
+    let mut grid = read_input("input/day15.txt").unwrap();
+
+    // Generate graph
+    let mut adj_map: HashMap<(usize, usize), Vec<((usize, usize), i32)>> = HashMap::new();
+    let mut tentative: HashMap<(usize, usize), i32> = HashMap::new();
+    gen_graph_5x(&mut grid, &mut adj_map, &mut tentative);
+
+    // Run dijkstras
+    dijkstra(&grid, &adj_map, &mut tentative);
+
+    // Get bottom right tentative distance (the min distance)
+    println!(
+        "Min risk: {:?}",
+        tentative.get(&(grid.len() - 1, grid[0].len() - 1))
+    );
 }
 
 pub fn run(day: i32) {
