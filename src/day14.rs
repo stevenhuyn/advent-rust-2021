@@ -121,7 +121,8 @@ pub fn run(day: i32) {
     println!("Ran in {}", now.elapsed().as_secs_f64());
 }
 
-pub fn read_input(filename: &str) -> Result<(String, Vec<((char, char), char)>), Box<dyn Error>> {
+type InsertionRule = ((char, char), char);
+pub fn read_input(filename: &str) -> Result<(String, Vec<InsertionRule>), Box<dyn Error>> {
     let file = File::open(filename)?;
     let bufreader = BufReader::new(file);
     let mut lines = bufreader.lines();
