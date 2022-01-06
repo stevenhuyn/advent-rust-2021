@@ -30,7 +30,7 @@ fn recurse_packet(packet: &str) -> (usize, usize, usize) {
 
     if type_id == 4 {
         // Literal value
-        let (literal_string, index_offset) = build_literal(&packet[6..], 0);
+        let (literal_string, index_offset) = build_literal(&packet[6..]);
         index_parsed += index_offset;
         final_result = usize::from_str_radix(&literal_string, 2).unwrap();
     } else if type_id == 0 {
@@ -167,18 +167,18 @@ fn recurse_packet_helper(version_sum: &mut usize, index_parsed: &mut usize, pack
     final_answer
 }
 
-fn build_literal(literal: &str, index_parsed: usize) -> (String, usize) {
+fn build_literal(literal: &str) -> (String, usize) {
     let mut answer = "".to_owned();
     answer.push_str(&literal[1..5]);
 
-    let mut new_index_parsed = 5;
+    let mut index_parsed = 5;
     if literal[0..1] == *"1" {
-        let (rest_str, index_offset) = build_literal(&literal[5..], new_index_parsed);
-        new_index_parsed += index_offset;
+        let (rest_str, index_offset) = build_literal(&literal[5..]);
+        index_parsed += index_offset;
         answer.push_str(&rest_str);
     }
 
-    (answer, new_index_parsed)
+    (answer, index_parsed)
 }
 
 fn packet_to_bits(hex_packet: &str) -> String {
