@@ -11,6 +11,7 @@ mod day14;
 mod day15;
 mod day16;
 mod day17;
+mod day18;
 mod day2;
 mod day3;
 mod day4;
@@ -46,6 +47,7 @@ fn run(day: i32, part: i32) {
         15 => day15::run(part),
         16 => day16::run(part),
         17 => day17::run(part),
+        18 => day18::run(part),
         _ => println!("bruh"),
     };
 }

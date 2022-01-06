@@ -21,7 +21,7 @@ pub fn run(day: i32) {
     println!("Ran in {}", now.elapsed().as_secs_f64());
 }
 
-pub fn read_input(filename: &str) -> Result<Vec<i32>, Box<dyn Error>> {
+fn read_input(filename: &str) -> Result<Vec<i32>, Box<dyn Error>> {
     let file = File::open(filename)?;
     let bufreader = BufReader::new(file);
     let lines = bufreader.lines();
