@@ -6,22 +6,24 @@ use std::time::Instant;
 fn solve_p1() {
     let hex_packet = read_input("input/day16.txt").unwrap();
     let bits = packet_to_bits(&hex_packet);
-    println!("{} {:?}", hex_packet, bits);
-
-    let (version_sum, _) = recurse_packet(&bits);
+    let (version_sum, _, _) = recurse_packet(&bits);
 
     println!("version sum: {}", version_sum);
 }
 
 fn solve_p2() {
-    println!("p2 answer")
+    let hex_packet = read_input("input/day16.txt").unwrap();
+    let bits = packet_to_bits(&hex_packet);
+    let (_, _, answer) = recurse_packet(&bits);
+
+    println!("Calculation: {}", answer);
 }
 
-fn recurse_packet(packet: &str) -> (usize, usize) {
+fn recurse_packet(packet: &str) -> (usize, usize, usize) {
     let version = usize::from_str_radix(&packet[..3], 2).unwrap();
     let type_id = usize::from_str_radix(&packet[3..6], 2).unwrap();
+    let final_result;
 
-    println!("Recurse! ver: {}, type: {}", version, type_id);
     let mut index_parsed = 6usize;
 
     let mut version_sum: usize = version;
@@ -30,37 +32,139 @@ fn recurse_packet(packet: &str) -> (usize, usize) {
         // Literal value
         let (literal_string, index_offset) = build_literal(&packet[6..], 0);
         index_parsed += index_offset;
-        let literal = usize::from_str_radix(&literal_string, 2).unwrap();
-        println!("literal: {}, {}", literal, index_parsed);
+        final_result = usize::from_str_radix(&literal_string, 2).unwrap();
+    } else if type_id == 0 {
+        // Sum
+        final_result = recurse_pack_with_length_type(
+            &mut version_sum,
+            &mut index_parsed,
+            packet,
+            0,
+            false,
+            |a, b| a + b,
+        );
+    } else if type_id == 1 {
+        // Product
+        final_result = recurse_pack_with_length_type(
+            &mut version_sum,
+            &mut index_parsed,
+            packet,
+            1,
+            false,
+            |a, b| a * b,
+        );
+    } else if type_id == 2 {
+        // Max
+        final_result = recurse_pack_with_length_type(
+            &mut version_sum,
+            &mut index_parsed,
+            packet,
+            usize::MAX,
+            false,
+            |a, b| a.min(b),
+        );
+    } else if type_id == 3 {
+        // Min
+        final_result = recurse_pack_with_length_type(
+            &mut version_sum,
+            &mut index_parsed,
+            packet,
+            usize::MIN,
+            false,
+            |a, b| a.max(b),
+        );
+    } else if type_id == 5 {
+        // >
+        final_result = recurse_pack_with_length_type(
+            &mut version_sum,
+            &mut index_parsed,
+            packet,
+            0,
+            true,
+            |a, b| if a > b { 1 } else { 0 },
+        );
+    } else if type_id == 6 {
+        // <
+        final_result = recurse_pack_with_length_type(
+            &mut version_sum,
+            &mut index_parsed,
+            packet,
+            0,
+            true,
+            |a, b| if a < b { 1 } else { 0 },
+        );
+    } else if type_id == 7 {
+        // ==
+        final_result = recurse_pack_with_length_type(
+            &mut version_sum,
+            &mut index_parsed,
+            packet,
+            0,
+            true,
+            |a, b| if a == b { 1 } else { 0 },
+        );
     } else {
-        // Operator packet
-        let length_type_id = &packet[6..7];
-        if length_type_id == "0" {
-            // next 15 bits are total length of packets
-            let length = usize::from_str_radix(&packet[7..22], 2).unwrap();
+        panic!("bruh")
+    }
 
-            // Read twice
-            index_parsed = 22;
-            while index_parsed < 22 + length {
-                recurse_packet_helper(&mut version_sum, &mut index_parsed, packet);
+    (version_sum, index_parsed, final_result)
+}
+
+fn recurse_pack_with_length_type(
+    version_sum: &mut usize,
+    index_parsed: &mut usize,
+    packet: &str,
+    default: usize,
+    assume_two: bool, // Assume 2 subpackets
+    apply: fn(usize, usize) -> usize,
+) -> usize {
+    let length_type_id = &packet[6..7];
+    let mut final_answer = default;
+
+    if length_type_id == "0" {
+        // next 15 bits are total length of packets
+        let length = usize::from_str_radix(&packet[7..22], 2).unwrap();
+
+        // Read twice
+        *index_parsed = 22;
+        if assume_two {
+            let first = recurse_packet_helper(version_sum, index_parsed, packet);
+            let second = recurse_packet_helper(version_sum, index_parsed, packet);
+            final_answer = apply(first, second);
+        } else {
+            while *index_parsed < 22 + length {
+                final_answer = apply(
+                    final_answer,
+                    recurse_packet_helper(version_sum, index_parsed, packet),
+                );
             }
-        } else if length_type_id == "1" {
-            // Number of sub packets
-            let sub_packets = usize::from_str_radix(&packet[7..18], 2).unwrap();
-            index_parsed = 18;
+        }
+    } else if length_type_id == "1" {
+        // Number of sub packets
+        let sub_packets = usize::from_str_radix(&packet[7..18], 2).unwrap();
+        *index_parsed = 18;
+        if assume_two {
+            let first = recurse_packet_helper(version_sum, index_parsed, packet);
+            let second = recurse_packet_helper(version_sum, index_parsed, packet);
+            final_answer = apply(first, second);
+        } else {
             for _ in 0..sub_packets {
-                recurse_packet_helper(&mut version_sum, &mut index_parsed, packet);
+                final_answer = apply(
+                    final_answer,
+                    recurse_packet_helper(version_sum, index_parsed, packet),
+                );
             }
         }
     }
 
-    (version_sum, index_parsed)
+    final_answer
 }
 
-fn recurse_packet_helper(version_sum: &mut usize, index_parsed: &mut usize, packet: &str) {
-    let (rest_version_sum, index_offset) = recurse_packet(&packet[*index_parsed..]);
+fn recurse_packet_helper(version_sum: &mut usize, index_parsed: &mut usize, packet: &str) -> usize {
+    let (rest_version_sum, index_offset, final_answer) = recurse_packet(&packet[*index_parsed..]);
     *version_sum += rest_version_sum;
     *index_parsed += index_offset;
+    final_answer
 }
 
 fn build_literal(literal: &str, index_parsed: usize) -> (String, usize) {
@@ -74,7 +178,6 @@ fn build_literal(literal: &str, index_parsed: usize) -> (String, usize) {
         answer.push_str(&rest_str);
     }
 
-    println!("str: {}, parsed: {}", literal, new_index_parsed);
     (answer, new_index_parsed)
 }
 
