@@ -120,40 +120,31 @@ fn recurse_pack_with_length_type(
 ) -> usize {
     let length_type_id = &packet[6..7];
     let mut final_answer = default;
+    *index_parsed = if length_type_id == "0" { 22 } else { 18 };
 
-    if length_type_id == "0" {
+    if assume_two {
+        let first = recurse_packet_helper(version_sum, index_parsed, packet);
+        let second = recurse_packet_helper(version_sum, index_parsed, packet);
+        final_answer = apply(first, second);
+    } else if length_type_id == "0" {
         // next 15 bits are total length of packets
         let length = usize::from_str_radix(&packet[7..22], 2).unwrap();
 
-        // Read twice
-        *index_parsed = 22;
-        if assume_two {
-            let first = recurse_packet_helper(version_sum, index_parsed, packet);
-            let second = recurse_packet_helper(version_sum, index_parsed, packet);
-            final_answer = apply(first, second);
-        } else {
-            while *index_parsed < 22 + length {
-                final_answer = apply(
-                    final_answer,
-                    recurse_packet_helper(version_sum, index_parsed, packet),
-                );
-            }
+        while *index_parsed < 22 + length {
+            final_answer = apply(
+                final_answer,
+                recurse_packet_helper(version_sum, index_parsed, packet),
+            );
         }
     } else if length_type_id == "1" {
         // Number of sub packets
         let sub_packets = usize::from_str_radix(&packet[7..18], 2).unwrap();
-        *index_parsed = 18;
-        if assume_two {
-            let first = recurse_packet_helper(version_sum, index_parsed, packet);
-            let second = recurse_packet_helper(version_sum, index_parsed, packet);
-            final_answer = apply(first, second);
-        } else {
-            for _ in 0..sub_packets {
-                final_answer = apply(
-                    final_answer,
-                    recurse_packet_helper(version_sum, index_parsed, packet),
-                );
-            }
+
+        for _ in 0..sub_packets {
+            final_answer = apply(
+                final_answer,
+                recurse_packet_helper(version_sum, index_parsed, packet),
+            );
         }
     }
 
