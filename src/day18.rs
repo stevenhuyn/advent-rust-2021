@@ -1,25 +1,68 @@
-use std::error::Error;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::time::Instant;
 
 #[derive(Debug)]
+enum SnailNode {
+    Value(i32),
+    Tree(Box<SnailNode>, Box<SnailNode>),
+}
+#[derive(Debug)]
 struct SnailNum {
-    value: i32,
-    depth: i32,
-    side: Side,
+    root: Option<SnailNode>,
 }
 
-#[derive(Debug, Copy, Clone)]
+impl SnailNum {
+    fn print(&self) {
+        println!("{:?}", self);
+    }
 
-enum Side {
-    Left,
-    Right,
+    fn read_tree(input: &str) -> SnailNum {
+        if input.is_empty() {
+            return SnailNum { root: None };
+        }
+
+        SnailNum {
+            root: Some(SnailNum::read_nodes(input)),
+        }
+    }
+
+    fn read_nodes(input: &str) -> SnailNode {
+        if let Some(mid_comma_ind) = SnailNum::find_middle_comma(input) {
+            SnailNode::Tree(
+                Box::new(SnailNum::read_nodes(&input[1..mid_comma_ind])),
+                Box::new(SnailNum::read_nodes(
+                    &input[mid_comma_ind + 1..input.len() - 1],
+                )),
+            )
+        } else {
+            SnailNode::Value(input.parse::<i32>().unwrap())
+        }
+    }
+
+    fn find_middle_comma(input: &str) -> Option<usize> {
+        let mut bracket_count = 0;
+        for (i, char) in input.chars().enumerate() {
+            if char == '[' {
+                bracket_count += 1;
+            } else if char == ']' {
+                bracket_count -= 1;
+            } else if char == ',' && bracket_count == 1 {
+                return Some(i);
+            }
+        }
+
+        None
+    }
 }
 
 fn solve_p1() {
-    let snail_lines = read_input("input/test18.txt");
-    println!("{:?}", snail_lines);
+    let snail_nums = read_input("input/test18.txt");
+
+    for snail_num in snail_nums {
+        snail_num.print();
+    }
+
     println!("p1 answer")
 }
 
@@ -37,40 +80,13 @@ pub fn run(day: i32) {
     println!("Ran in {}", now.elapsed().as_secs_f64());
 }
 
-fn read_input(filename: &str) -> Vec<Vec<SnailNum>> {
+fn read_input(filename: &str) -> Vec<SnailNum> {
     let file = File::open(filename).unwrap();
     let bufreader = BufReader::new(file);
     let lines = bufreader.lines();
 
-    // Absoluty disgusting
     lines
-        .map(|line| {
-            let mut depth = 0;
-            let mut side = Side::Left;
-            line.unwrap()
-                .chars()
-                .filter_map(|c| {
-                    c.to_digit(10)
-                        .or_else(|| {
-                            match c {
-                                '[' => {
-                                    depth += 1;
-                                    side = Side::Left
-                                }
-                                ']' => depth -= 1,
-                                ',' => side = Side::Right,
-                                _ => (),
-                            }
-                            None
-                        })
-                        .map(|value| SnailNum {
-                            value: value as i32,
-                            depth,
-                            side,
-                        })
-                })
-                .collect()
-        })
+        .map(|line| SnailNum::read_tree(&line.unwrap()))
         .collect()
 }
 
