@@ -2,7 +2,15 @@
 extern crate test;
 use std::env;
 
-mod day1;
+mod day01;
+mod day02;
+mod day03;
+mod day04;
+mod day05;
+mod day06;
+mod day07;
+mod day08;
+mod day09;
 mod day10;
 mod day11;
 mod day12;
@@ -12,14 +20,6 @@ mod day15;
 mod day16;
 mod day17;
 mod day18;
-mod day2;
-mod day3;
-mod day4;
-mod day5;
-mod day6;
-mod day7;
-mod day8;
-mod day9;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -30,15 +30,15 @@ fn main() {
 
 fn run(day: i32, part: i32) {
     match day {
-        1 => day1::run(part),
-        2 => day2::run(part),
-        3 => day3::run(part),
-        4 => day4::run(part),
-        5 => day5::run(part),
-        6 => day6::run(part),
-        7 => day7::run(part),
-        8 => day8::run(part),
-        9 => day9::run(part),
+        1 => day01::run(part),
+        2 => day02::run(part),
+        3 => day03::run(part),
+        4 => day04::run(part),
+        5 => day05::run(part),
+        6 => day06::run(part),
+        7 => day07::run(part),
+        8 => day08::run(part),
+        9 => day09::run(part),
         10 => day10::run(part),
         11 => day11::run(part),
         12 => day12::run(part),
