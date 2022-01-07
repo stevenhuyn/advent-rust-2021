@@ -54,6 +54,32 @@ impl SnailNum {
 
         None
     }
+
+    fn reduce_tree(mut self, depth: i32) {
+        if let Some(root) = self.root {
+            self.root = Some(SnailNum::reduce_node(root));
+        }
+    }
+
+    fn reduce_node(node: SnailNode) -> SnailNode {
+        if let SnailNode::Value(v) = node {
+            if v >= 10 {
+                // SPLIT
+                let half = v as f32 / 2f32;
+                return SnailNode::Tree(
+                    Box::new(SnailNode::Value(half.ceil() as i32)),
+                    Box::new(SnailNode::Value(half.floor() as i32)),
+                );
+            }
+        } else if let SnailNode::Tree(box left, box right) = node {
+            if depth >= 5 {
+                // EXPLODE
+            }
+            node
+        }
+
+        node
+    }
 }
 
 fn solve_p1() {

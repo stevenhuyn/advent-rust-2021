@@ -1,4 +1,6 @@
 #![feature(test)]
+#![feature(box_patterns)]
+
 extern crate test;
 use std::env;
 
