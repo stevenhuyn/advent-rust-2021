@@ -12,6 +12,12 @@ struct SnailNum {
     root: Option<SnailNode>,
 }
 
+#[derive(Debug)]
+enum Side {
+    Left,
+    Right,
+}
+
 impl SnailNum {
     fn print(&self) {
         println!("{:?}", &self);
@@ -108,6 +114,46 @@ impl SnailNum {
         } else if let SnailNode::Node(left, right) = node {
             SnailNum::traverse(*left);
             SnailNum::traverse(*right);
+        }
+    }
+
+    fn explode(node: SnailNode, depth: usize) -> (Option<i32>, Option<i32>) {
+        if let SnailNode::Node(left, right) = node {
+            if depth == 4 {
+                if let (SnailNode::Value(left_value), SnailNode::Value(right_value)) =
+                    (*left, *right)
+                {
+                    return (Some(left_value), Some(right_value));
+                } else {
+                    panic!("Depth > 4 but no values")
+                }
+            }
+
+            // Left child explodes
+            let child_exp = SnailNum::explode(*child_node, depth + 1);
+            if child_exp != (None, None) {
+                return child_exp;
+            }
+
+            for child_node in [left, right] {
+                let child_exp = SnailNum::explode(*child_node, depth + 1);
+                if child_exp != (None, None) {
+                    return child_exp;
+                }
+            }
+        }
+
+        return (None, None);
+    }
+
+    fn step_add(direction: Side, node: &mut SnailNode, add: i32) {
+        if let SnailNode::Node(left, right) = node {
+            match direction {
+                Side::Left => SnailNum::step_add(direction, left, add),
+                Side::Right => SnailNum::step_add(direction, right, add),
+            }
+        } else if let SnailNode::Value(v) = node {
+            *v += add;
         }
     }
 }
